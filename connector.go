@@ -66,7 +66,12 @@ func (c *Connector) Connect(ctx context.Context) (driver.Conn, error) {
 			},
 		},
 	}
-	_, err = conn.helperSendAndRecv(&request)
+	response, err := conn.helperSendAndRecv(&request)
+	if !response.GetConnectionResponse().GetIsCompatible() {
+		return nil, &ClientError{
+			message: "The API version is incompatible with server",
+		}
+	}
 	if err != nil {
 		return nil, err
 	}
